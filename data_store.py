@@ -34,7 +34,10 @@ class SqliteStore:
         :param instrument: Name of the instrument
         :return: range of date of stored data for instrument
         """
-        pass
+        with sqlite3.connect(self.dbname) as con:
+            q = f"select instrument,max(date), min(date) from prices where instrument='{instrument}'"
+            cur = con.cursor()
+            return cur.execute(q).fetchone()
 
     def put_data_from_csv(self, csv_filename):
         """
@@ -70,4 +73,8 @@ class SqliteStore:
                 row_date = datetime.strptime(row['date'], "%d-%b-%Y")
                 b = f"insert into prices values ('{row['instrument']}', '{row_date}', '{row['open']}'," \
                     f" '{row['high']}', '{row['low']}', '{row['close']}', '{row['volume']}')"
-                cur.execute(b)
+                try:
+                    cur.execute(b)
+                except sqlite3.IntegrityError as e:
+                    print(e)
+                    pass
