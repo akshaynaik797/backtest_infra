@@ -21,7 +21,10 @@ class SqliteStore:
         :param to_date: end date
         :return: pandas dataframe
         """
-        pass
+        with sqlite3.connect(self.dbname) as con:
+            q = f"select * from prices where instrument='{instrument}' and date between '{from_date}' and '{to_date}'"
+            return pd.read_sql_query(q, con)
+
 
     def list_symbols(self):
         """
