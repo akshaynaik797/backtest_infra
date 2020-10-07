@@ -27,7 +27,10 @@ class SqliteStore:
         """
         :return: list of available symbols in db
         """
-        pass
+        with sqlite3.connect(self.dbname) as con:
+            q = "select distinct instrument from prices"
+            cur = con.cursor()
+            return [i[0] for i in cur.execute(q).fetchall()]
 
     def get_date_range(self, instrument):
         """
